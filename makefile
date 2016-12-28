@@ -1,25 +1,23 @@
-EXECUTABLE = httpserver 
+# You shouldn't need to change anything below this point
 
-SOURCE :=$(wildcard *.cpp) $(wildcard *.cc)
-OBJS := $(patsubst %.cpp,%.o,$(patsubst %.cc,%.o,$(SOURCE))) 
+SOURCE :=$(wildcard *.cpp) 
+OBJS := $(patsubst %.cpp,%.o,$(SOURCE)) 
 DEPS := $(patsubst %.o,%.d,$(OBJS)) 
+MISSING_DEPS := $(filter-out $(wildcard $(DEPS)),$(DEPS)) 
 
-.PHONY : everything deps objs clean rebuild 
-
-everything : $(EXECUTABLE) 
+.PHONY : everything deps objs clean  
+everything: libbbt.a
 
 deps : $(DEPS) 
 objs : $(OBJS) 
 
-clean : 
-	-rm *.o 
-	-rm *.d 
-	-rm $(EXECUTABLE) 
-
-rebuild: clean everything 
+clean :
+	rm *.o 
+	rm *.d 
+	rm libbbt.a
 
 
 -include $(DEPS) 
 
-$(EXECUTABLE) : $(OBJS) 
-	$(CXX) $(LDFLAGS) -o $(EXECUTABLE) $(OBJS) $(addprefix -l,$(LIBS))
+libbbt.a : $(OBJS) 
+	$(AR) rcs $@ $(OBJS) 
